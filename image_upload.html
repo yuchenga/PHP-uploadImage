@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="__JS__/jquery.js" type="text/javascript"></script>
+<script src="__JS__/uploadify/jquery.uploadify.js" type="text/javascript"></script>
+
+<title>无标题文档</title>
+<style>
+.upload{width:495px;border:#CCC; border:#d2d2d2 solid 1px; padding:15px 0 0 15px; background:#fff;}
+.upload-box{position:relative; width:150px; height:120px; margin-right:15px; float:left; overflow:hidden; margin-bottom:15px;}
+.upload-box img{width:150px; height:120px;}
+.upload-box i.close{ background:url(/public/themes/default/images/close.gif) no-repeat 0 0; width:20px; height:20px; position:absolute; right:2px; top:2px; cursor:pointer;}
+.upload-box i.close:hover{background:url(/public/themes/default/images/close.gif) no-repeat 0 -20px;}
+.upload-box span{width:100%; height:30px; line-height:30px;background:rgba(0,0,0,0.75) !important; position:absolute; color:#fff; font-size:12px; bottom:-30px; text-align:center; left:0; transition:all ease 0.5s;filter:Alpha(opacity=75); background:#000;/*实现IE背景透明*/}
+.upload-box:hover span{bottom:0px;}
+.upload-box span a{ display:block; color:#fff; text-decoration:none}
+.clearupload{clear:both;}
+.upload .utn{ padding:0 0 15px 0;}
+.upload_button{background:url(/public/themes/default/images/btn.jpg) no-repeat; width:99px; height:23px; border:0}
+</style>
+</head>
+
+<body>
+   
+<div class="upload">
+    <div class="utn"> 
+        <dd id="file_upload"></dd>
+    </div>
+   
+    
+    <div class="clearupload"></div>
+</div>
+</body>
+</html>
+<script>
+
+      $(function() {
+                //定义一个对象用于传递上传图片插件参数
+	var options = {
+			debug:false,
+			auto :true,
+			buttonText:"",
+			itemTemplate:false,
+			queueSizeLimit:8,
+			height:30,
+			width :120,
+			buttonClass:'upload_button',
+		        buttonImage :null
+			
+	}
+        //+---------------------------------------------------
+	//|	定义一个函数用于插件初始化
+	//+---------------------------------------------------
+	
+            //编辑框元素初始化
+            $('#file_upload').uploadify({
+                    'debug'         :options.debug,
+                    'auto'			:options.auto,
+                    'successTimeout':99999,
+                    'buttonText'    :options.buttonText,
+                    'itemTemplate'  :options.itemTemplate,
+                    'buttonImage'   :options.buttonImage,
+                    'buttonClass'	:options.buttonClass,
+                    'height'        :options.height,
+                    'width'			:options.width,
+                    'formData'     : {
+                    },
+                    'swf'      : '__JS__/uploadify/uploadify.swf',
+                    'uploader' : '{:U("Admin/News/news_upload_img","",true,false,true)}',
+                             //在浏览窗口底部的文件类型下拉菜单中显示的文本
+                    'fileTypeDesc':'支持的格式：',
+                            //允许上传的文件后缀
+                    'fileTypeExts':'*.jpg;*.jpge;*.gif;*.png',
+                             //上传文件的大小限制
+                    'fileSizeLimit':'2MB',
+                             //上传数量
+                    'queueSizeLimit':options.queueSizeLimit, 
+                    'progressData':false,
+                    'removeCompleted':false,
+                    'removeTimeout' :0,
+                    'onSelectError':function(file, errorCode, errorMsg){
+                            switch(errorCode) {
+                            case -100:
+                                     alert("上传的文件数量已经超出系统限制的"+$('#file_upload').uploadify('settings','queueSizeLimit')+"个文件！");
+                                     break;
+                            case -110:
+                                     alert("文件 ["+file.name+"] 大小超出系统限制的"+$('#file_upload').uploadify('settings','fileSizeLimit')+"大小！");
+                                     break;
+                            case -120:
+                                     alert("文件 ["+file.name+"] 大小异常！");
+                                     break;
+                                     case -130:
+                                     alert("文件 ["+file.name+"] 类型不正确！");
+                                     break;
+                                    }//end switch
+                            },//end onSelectError
+                    //检测FLASH失败调用
+                     'onFallback':function(){
+                             alert("您未安装FLASH控件，无法上传图片！请安装FLASH控件后再试。");
+                            },//end onFallback
+                      'onInit'       : function () {     //载入时触发，将flash设置到最小
+                            $("#file_upload-queue").hide();
+                      },
+                    //上传到服务器，服务器返回相应信息到data里
+                    'onUploadSuccess':function(file, data, response){
+                             $('.clearupload').before('<div class="upload-box"><img src="__UPLOAD__{$newspath.path}'+data+'" /><span><a class="top" onclick="tops(this)" href="javascript:void(0);">设为封面</a></span><i class="close"></i></div>');      
+                             setType();   
+               }//end onUploadSuccess
+            });//end $(objUpload).uploadify
+
+      })
+  $(".upload-box .close").bind("click",function(){ 
+        $(this).parent().remove(); 
+  });
+  
+  
+  
+  function tops(a){
+      
+       var now   ='<div class="upload-box">'+ $(a).parent().parent().html() +'</div>';
+        $(a).parent().parent().remove(); 
+        $('.upload-box').first().before(now);
+        $('.upload-box').first().css('opacity',0);
+        $('.upload-box').first().animate({opacity:1});
+        setType();      
+  }
+  
+  function setType(){
+       $('.upload-box').siblings().find('span').removeAttr('style');
+       $('.upload-box').siblings().find('span a').text('设为封面');
+       
+       $('.upload-box').first().find('span').css('bottom','0');
+       $('.upload-box').first().find('span a').text('封面');
+  }
+ 
+</script>
