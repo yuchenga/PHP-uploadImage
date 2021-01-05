@@ -2,7 +2,7 @@
 
 /**
  * 新闻管理控制器
- *tests
+ *122123
  * @author nielixin 2014-2-27
  */
 class NewsAction extends AdminBaseAction {
